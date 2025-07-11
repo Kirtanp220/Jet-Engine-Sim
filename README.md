@@ -1,4 +1,4 @@
-Jet Engine Inlet to Outlet Simulator
+Jet Engine Inlet to Outlet Simulator (Subsonic)
 ------------------------------------
 
 This project simulates how air flows from ambient conditions through the inlet diffuser to the outlet. It analyzes how air compresses through the system and demonstrates the First Law of Thermodynamics. The simulation tracks both ideal and real values of temperature, pressure, enthalpy, Mach number, and energy flow from the inlet to the outlet.
