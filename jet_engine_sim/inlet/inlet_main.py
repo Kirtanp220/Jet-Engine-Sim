@@ -2,7 +2,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-from inlet_functions import *
+from jet_engine_sim.inlet.inlet_functions import *
 
 # Input Parameters
 P1 = 101325  # Pa, Inlet Pressure
@@ -12,8 +12,8 @@ R = 287.05  # J/(kg*K), Specific gas constant for air
 cp = 1005  # J/(kg*K), Specific heat at constant pressure for air
 eta_i = 0.96  # Efficiency of the inlet
 V1 = 237  # m/s, Inlet Velocity
-m_flow = 20  # kg/s, Mass flow rate
-V2 = 40  # m/s, Outlet Velocity (not used in this calculation but can be used for further calculations)
+m_flow = 115  # kg/s, Mass flow rate
+V2 = 125  # m/s, Outlet Velocity (not used in this calculation but can be used for further calculations)
 eta_p = 0.99  # Efficiency of the pressure recovery
 
 #Calculations for Inlet and Outlet
@@ -27,15 +27,13 @@ T2 = calculate_new_static_temperature_at_outlet(T1, V1, V2, cp)
 M1, M2 = calculate_mach_number(T1, T2, V1, V2, R, gamma, 0, 0)  # Assuming a1 and a2 are not used in this calculation
 rho1, rho2 = calculate_densities_at_inlet_outlet(P1, T1, T2, R)
 area_ratio = calculate_area_ratio(V2, V1, rho1, rho2)
-T0_outlet = calculate_ideal_stagnation_temperature(T2, V2, R)
-P0_outlet = calculate_real_stagnation_pressure(P0_real_after_eta_p, T0_outlet, T2, gamma)
-P2 = calculate_static_pressure_at_outlet(P1, T1, T2, gamma)
+T0_outlet = calculate_ideal_stagnation_temperature(T2, M2, gamma)
+P2 = calculate_static_pressure_at_outlet(P0_real_after_eta_p, M2, gamma)
+P0_outlet = calculate_real_stagnation_pressure(P2, T2, T0_outlet, gamma)
 T0_real_outlet = T0_real
 h0_real_outlet = calculate_stagnation_enthalpy(T0_real_outlet, cp)
 energy_flow_outlet = calculate_energy_flow(m_flow, h0_real_outlet)
-P0_actual_outlet = P0_real_after_eta_p
-P0_ideal_outlet = P0_outlet
-pressure_lost = calculate_pressure_lost(P0_ideal_outlet, P0_actual_outlet)
+pressure_lost = calculate_pressure_lost(P0_real, P0_real_after_eta_p)
 
 labels = ['Inlet', 'Outlet']
 bar_width = 0.35  # Width of the bars
@@ -66,7 +64,7 @@ plt.show()
 #Stagnation Pressure
 plt.figure(figsize=(8, 6))
 plt.bar(x - bar_width/2, [139000, 132000], width=bar_width, label='Standard Subsonic Inlet Stagnation Pressure', color='blue')
-plt.bar(x + bar_width/2, [P0_ideal_outlet, P0_real_after_eta_p], width=bar_width, label='Calculated Stagnation Pressure', color='orange')
+plt.bar(x + bar_width/2, [P0_real, P0_real_after_eta_p], width=bar_width, label='Calculated Stagnation Pressure', color='orange')
 plt.title('Stagnation Pressure Comparison')
 plt.xticks(x, labels)
 plt.ylabel('Pressure (Pa)')
@@ -111,11 +109,11 @@ print(f"Mach Number at Outlet (M2): {M2:.2f}")
 
 print(f"Density at Inlet (rho1): {rho1:.2f} kg/m^3")
 print(f"Density at Outlet (rho2): {rho2:.2f} kg/m^3")
-print(f"Area Ratio (A1/A2): {area_ratio:.2f}")
+print(f"Area Ratio (A2/A1): {area_ratio:.2f}")
 
 print(f"Pressure Lost due to Inefficiencies: {pressure_lost:.2f}%")
-print(f"Real Stagnation Pressure at Outlet: {P0_actual_outlet:.2f} Pa")
-print(f"Ideal Stagnation Pressure at Outlet: {P0_ideal_outlet:.2f} Pa")
+print(f"Real Stagnation Pressure at Outlet: {P0_real:.2f} Pa")
+print(f"Ideal Stagnation Pressure at Outlet: {P0_real:.2f} Pa")
 
 
 # Define Station Numbers
@@ -197,6 +195,10 @@ plt.legend()
 plt.grid()
 plt.show()
 # the code graphs the relationship between static temperature and velocity in the jet engine inlet, showing how the velocity changes with static temperature from the inlet to the outlet.
+# End of Inlet --> Outlet Simulation
+
+
+
 
 
 

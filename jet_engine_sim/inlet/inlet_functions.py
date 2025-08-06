@@ -153,51 +153,53 @@ def calculate_area_ratio(V1, V2, rho1, rho2):
     Returns:
     float: Area ratio.
     """
-    return (V1/V2) * (rho2/rho1)
+    A1_A2 = (V1/V2) * (rho2/rho1)
+    A2_A1 = 1 / A1_A2  # Area ratio A2/A1
 
-def calculate_ideal_stagnation_temperature_at_outlet(T1, eta_i, T0_real):
+    return A2_A1
+
+def calculate_ideal_stagnation_temperature_at_outlet(T2, M2, gamma):
     """
     Calculate the ideal stagnation temperature at the outlet.
     
     Parameters:
-    T1 (float): Static temperature at inlet in Kelvin.
-    eta_i (float): Efficiency of the inlet.
-    T0_real (float): Real stagnation temperature in Kelvin.
+    T2 (float): Static temperature at outlet in Kelvin.
+    M2 (float): Mach number at outlet.
+    gamma (float): Ratio of specific heats (Cp/Cv).
     
     Returns:
     float: Ideal stagnation temperature at outlet in Kelvin.
     """
-    return T1 + eta_i * (T0_real - T1)
+    return T2 * (1 + ((gamma - 1) / 2) * M2**2)
 
-def calculate_ideal_stagnation_pressure_at_outlet(P1, T1, T0_outlet, gamma):
+def calculate_ideal_stagnation_pressure_at_outlet(P2, T2, T0_outlet, gamma):
     """
     Calculate the ideal stagnation pressure at the outlet.
     
     Parameters:
-    P1 (float): Static pressure at inlet in Pa.
-    T1 (float): Static temperature at inlet in Kelvin.
+    P2 (float): Static pressure at outlet in Pa.
+    T2 (float): Static temperature at outlet in Kelvin.
     T0_outlet (float): Ideal stagnation temperature at outlet in Kelvin.
     gamma (float): Ratio of specific heats (Cp/Cv).
     
     Returns:
     float: Ideal stagnation pressure at outlet in Pa.
     """
-    return P1 * (T0_outlet / T1) ** (gamma / (gamma - 1))
+    return P2 * (T0_outlet / T2) ** (gamma / (gamma - 1))
 
-def calculate_static_pressure_at_outlet(P0_outlet, T2, T0_outlet, gamma):
+def calculate_static_pressure_at_outlet(P0_real_after_eta_p, M2, gamma):
     """
     Calculate the static pressure at the outlet.
     
     Parameters:
-    P0_outlet (float): Ideal stagnation pressure at outlet in Pa.
-    T2 (float): Static temperature at outlet in Kelvin.
-    T0_outlet (float): Ideal stagnation temperature at outlet in Kelvin.
+    P0_real_after_eta_p (float): Real stagnation pressure after efficiency in Pa.
+    M2 (float): Mach number at outlet.
     gamma (float): Ratio of specific heats (Cp/Cv).
     
     Returns:
     float: Static pressure at outlet in Pa.
     """
-    return P0_outlet * (T2 / T0_outlet) ** (gamma / (gamma - 1))
+    return P0_real_after_eta_p / ((1 + ((gamma - 1) / 2) * M2**2) ** (gamma / (gamma - 1)))
 
 
 def calculate_real_stagnation_enthalpy_at_outlet(T0_real_outlet, cp):
@@ -227,16 +229,16 @@ def calculate_energy_flow(m_flow, h0_real_outlet):
     return m_flow * h0_real_outlet
 
 
-def calculate_pressure_lost(P0_ideal_outlet, P0_actual_outlet):
+def calculate_pressure_lost(P0_ideal, P0_real_after_eta_p):
     """
-    Calculate the pressure lost.
+    Calculate the pressure lost due to inefficiencies.
     
     Parameters:
-    P0_ideal_outlet (float): Ideal stagnation pressure at outlet in Pa.
-    P0_actual_outlet (float): Actual stagnation pressure at outlet in Pa.
+    P0_ideal (float): Ideal stagnation pressure in Pa.
+    P0_real_after_eta_p (float): Real stagnation pressure after efficiency in Pa.
     
     Returns:
-    float: Pressure lost in Pa.
+    float: Pressure lost as a percentage.
     """
-    return (P0_ideal_outlet - P0_actual_outlet) / P0_ideal_outlet * 100
+    return ((P0_ideal - P0_real_after_eta_p) / P0_ideal) * 100
 
